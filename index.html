@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>dz_7</title>
+</head>
+<body>
+    <canvas width="500" height="500"></canvas>
+    <script>
+
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+
+        var linearGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        linearGradient.addColorStop(0, 'hsl(100, 50%, 50%)');
+        linearGradient.addColorStop(0.5, 'hsl(100, 50%, 80%)');
+        linearGradient.addColorStop(1, 'hsl(100, 50%, 50%)');
+
+        var radialGradient;
+
+
+        function drawCircle(x, y, radius, startAngle, endAngle, fillColor, strokeColor, lineWidth) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, Math.PI*startAngle/180, Math.PI*endAngle/180, false);
+            if(fillColor) {
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+            }
+            if(strokeColor) {
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = lineWidth;
+                ctx.stroke();
+            }
+        }
+
+        function animateRadialGradient(angle) {
+            radialGradient = ctx.createRadialGradient(
+                    5*Math.cos((angle*2)* Math.PI / 180) - 5, (-5)*Math.sin((angle*2)* Math.PI / 180), 20,
+                    0, 0, 30);
+            radialGradient.addColorStop(0, 'hsl(50, 75%, 50%)');
+            radialGradient.addColorStop(1, 'hsl(50, 85%, 70%)');
+            return radialGradient;
+        }
+
+        function drawSmile(angle) {
+            drawCircle(0, 0, 30, 0, 360, animateRadialGradient(angle), false);
+            drawCircle(11, -7, 7, 0, 360, '#fff', '#333', 2);
+            drawCircle(11 - 3 * Math.cos((angle*2)* Math.PI / 180) + 3, -7 + 3 * (Math.sin((angle*2)* Math.PI / 180)), 3, 0, 360, 'blue', false);
+            drawCircle(-11, -7, 7, 0, 360, '#fff', '#333', 2);
+            drawCircle(-11 - 3 * Math.cos((angle*2)* Math.PI / 180) + 3, -7 + 3 * (Math.sin((angle*2)* Math.PI / 180)), 3, 0, 360, 'blue', false);
+            drawCircle(0, 3, (-5)*Math.cos((angle*2)* Math.PI / 180) + 10, 30, 150, false, '#333', 3);
+        }
+
+        smile = {
+            x: canvas.width/2,
+            y: canvas.height/2,
+            angle: 0
+        };
+
+        function draw() {
+            ctx.fillStyle = linearGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'hsl(100, 50%, 25%)';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(3, 3, canvas.width-6, canvas.height-6);
+
+            ctx.save();
+            ctx.translate(smile.x, smile.y);
+            ctx.rotate(smile.angle * Math.PI / 180);
+            drawSmile(smile.angle);
+            ctx.restore();
+
+            ctx.font = "15px 'Comic Sans MS'";
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 0.7;
+            ctx.strokeText("scorp7mix@gmail.com", 340, 485, 150);
+
+            if(smile.angle >= 720) {
+                smile.angle = 0;
+            } else {
+                smile.angle++;
+            }
+            smile.x = canvas.width/2 - (canvas.width/2 - 40) * Math.cos((smile.angle/4) * Math.PI / 180);
+            smile.y = canvas.height/2 - (canvas.height/2 - 40) * Math.sin(smile.angle * Math.PI / 180);
+
+        }
+
+        var interval = setInterval(draw, 40);
+
+        document.onclick = function(){
+            console.log('click');
+            console.log(interval);
+            if(interval) {
+                console.log('stop');
+                clearInterval(interval);
+                interval = undefined;
+            } else {
+                console.log('start');
+                interval = setInterval(draw, 40);
+            }
+        };
+    </script>
+</body>
+</html>
